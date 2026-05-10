@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Neural Ops — AI Training Scheduler</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-brand">
+    <div class="brand-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/>
+      </svg>
+    </div>
+    <div>
+      <h1 class="brand-title">Neural Ops</h1>
+      <span class="brand-sub">AI Training Job Scheduler</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="sys-badge" id="sys-status">
+      <span class="pulse-dot"></span>
+      <span>System Online</span>
+    </div>
+    <div class="clock" id="clock">--:--:--</div>
+  </div>
+</header>
+
+<main class="main-grid">
+
+  <aside class="left-col">
+
+    <section class="card" id="submit-card">
+      <div class="card-header">
+        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M12 4v16m8-8H4"/>
+        </svg>
+        <h2>Submit Training Job</h2>
+      </div>
+
+      <form id="job-form" autocomplete="off">
+        <div class="form-group">
+          <label>Job Name</label>
+          <input type="text" id="f-name" placeholder="e.g. BERT-Large Training" required/>
+        </div>
+        <div class="form-group">
+          <label>Model Type</label>
+          <select id="f-model">
+            <option>Transformer</option>
+            <option>CNN</option>
+            <option>RNN / LSTM</option>
+            <option>GAN</option>
+            <option>Diffusion</option>
+            <option>Reinforcement</option>
+            <option>Custom</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>GPU Slots <span class="hint">(max 8)</span></label>
+            <input type="number" id="f-gpu" value="2" min="1" max="8" required/>
+          </div>
+          <div class="form-group">
+            <label>CPU Cores <span class="hint">(max 16)</span></label>
+            <input type="number" id="f-cpu" value="4" min="1" max="16" required/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Priority</label>
+          <div class="prio-buttons">
+            <button type="button" class="prio-btn" data-prio="High">🔴 High</button>
+            <button type="button" class="prio-btn active" data-prio="Medium">🟡 Medium</button>
+            <button type="button" class="prio-btn" data-prio="Low">🟢 Low</button>
+          </div>
+          <input type="hidden" id="f-priority" value="Medium"/>
+        </div>
+        <div class="form-group">
+          <label>Duration <span class="hint">(seconds)</span></label>
+          <input type="number" id="f-duration" value="30" min="5" max="300" required/>
+        </div>
+        <button type="submit" class="btn-submit" id="submit-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14m-7-7 7 7-7 7"/>
+          </svg>
+          Queue Job
+        </button>
+        <div id="submit-msg" class="submit-msg"></div>
+      </form>
+    </section>
+
+    <section class="card" id="resource-card">
+      <div class="card-header">
+        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z"/>
+        </svg>
+        <h2>Resource Pool</h2>
+      </div>
+
+      <div class="resource-item">
+        <div class="res-label">
+          <span>GPU Slots</span>
+          <span class="res-val" id="gpu-val">– / 8</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill gpu-fill" id="gpu-bar"></div>
+        </div>
+      </div>
+
+      <div class="resource-item">
+        <div class="res-label">
+          <span>CPU Cores</span>
+          <span class="res-val" id="cpu-val">– / 16</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill cpu-fill" id="cpu-bar"></div>
+        </div>
+      </div>
+
+      <div class="resource-item">
+        <div class="res-label">
+          <span>Exec Slots (Semaphore)</span>
+          <span class="res-val" id="sem-val">– / 4</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill sem-fill" id="sem-bar"></div>
+        </div>
+      </div>
+
+      <div class="stat-chips">
+        <div class="stat-chip chip-pending"  id="c-pending">0 Pending</div>
+        <div class="stat-chip chip-running"  id="c-running">0 Running</div>
+        <div class="stat-chip chip-done"     id="c-done">0 Done</div>
+        <div class="stat-chip chip-preempt" id="c-preempt">0 Preempted</div>
+      </div>
+    </section>
+
+  </aside>
+
+  <section class="charts-col">
+
+    <div class="charts-grid">
+      <div class="card chart-card">
+        <div class="card-header">
+          <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>
+          </svg>
+          <h2>GPU &amp; CPU Utilization</h2>
+        </div>
+        <canvas id="utilChart"></canvas>
+      </div>
+
+      <div class="card chart-card">
+        <div class="card-header">
+          <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="9"/><path d="M12 12 8.5 7.5"/>
+          </svg>
+          <h2>Job Status Distribution</h2>
+        </div>
+        <canvas id="statusChart"></canvas>
+      </div>
+
+      <div class="card chart-card">
+        <div class="card-header">
+          <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="8"/><rect x="13" y="6" width="3" height="12"/>
+          </svg>
+          <h2>Queue Depth Over Time</h2>
+        </div>
+        <canvas id="queueChart"></canvas>
+      </div>
+
+      <div class="card chart-card">
+        <div class="card-header">
+          <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 12V7"/><path d="M12 12h5"/>
+          </svg>
+          <h2>Runtime vs Estimate</h2>
+        </div>
+        <canvas id="runtimeChart"></canvas>
+      </div>
+    </div>
+
+  </section>
+</main>
+
+<section class="table-section card">
+  <div class="card-header">
+    <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2"/>
+    </svg>
+    <h2>Job Queue</h2>
+    <span class="table-count" id="tbl-count">0 jobs</span>
+  </div>
+  <div class="table-wrap">
+    <table id="job-table">
+      <thead>
+        <tr>
+          <th>#</th><th>Job Name</th><th>Model</th>
+          <th>Priority</th><th>Status</th>
+          <th>GPU</th><th>CPU</th>
+          <th>Wait</th><th>Runtime</th>
+          <th>Est.</th><th>Progress</th>
+        </tr>
+      </thead>
+      <tbody id="job-tbody">
+        <tr class="empty-row"><td colspan="11">No jobs yet — submit one above</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="log-section card">
+  <div class="card-header">
+    <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+      <line x1="16" y1="13" x2="8" y2="13"/>
+      <line x1="16" y1="17" x2="8" y2="17"/>
+    </svg>
+    <h2>Scheduler Log</h2>
+    <label class="autoscroll-toggle">
+      <input type="checkbox" id="autoscroll" checked/>
+      <span>Auto-scroll</span>
+    </label>
+  </div>
+  <div class="log-body" id="log-body"></div>
+</section>
+
+<script src="app.js"></script>
+</body>
+</html>
