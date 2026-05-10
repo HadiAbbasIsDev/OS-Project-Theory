@@ -1,4 +1,3 @@
-# Project Report
 ## AI Model Training Job Scheduler
 **Course:** Operating Systems — Spring 2026  
 **Team:** Hadi Abbas (23k-0927) · Layqa Fatima (23k-0572) · Areesha Merani (24k-0762)
