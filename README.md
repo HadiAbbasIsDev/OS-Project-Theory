@@ -3,6 +3,7 @@
 **Team:** Hadi Abbas (23k-0927) · Layqa Fatima (23k-0572) · Areesha Merani (24k-0762)
 
 ---
+![Logo](frontend/Main2.png)
 
 ## 1. Objective
 
@@ -198,8 +199,7 @@ All five test cases from Section 5.5 were verified:
 
 ### 6.2 Resource Utilisation Observations
 
-*(Replace the placeholder below with a screenshot of the GPU/CPU line chart from your dashboard during a loaded test run.)*
-
+![Logo](frontend/resourcepool.png)
 ```
 [ INSERT SCREENSHOT: GPU & CPU Utilisation chart — dual-line showing
   GPU used (blue) and CPU used (violet) over ~60 seconds of a T2 test ]
@@ -228,8 +228,7 @@ During a typical T4 test (preemption scenario), the doughnut showed:
 
 ### 6.4 Runtime vs Estimate
 
-*(Replace with a screenshot of the grouped bar chart for completed jobs.)*
-
+![Logo](frontend/runtimeestimate.png)
 ```
 [ INSERT SCREENSHOT: Runtime vs Estimate grouped bar chart for completed jobs ]
 ```
@@ -239,8 +238,7 @@ Example: a job with `est_duration = 30 s` completed in 30.0–30.1 s.
 
 ### 6.5 Starvation Demonstration
 
-*(Replace with log viewer screenshot showing AGING entries before LOW job starts.)*
-
+![Logo](frontend/jobqueue.png)
 ```
 [ INSERT SCREENSHOT: Log viewer showing:
   14:35:05.012 [AGING] Priority boost +1 → Job #9 'Low-Test'
