@@ -3,7 +3,7 @@
 **Team:** Hadi Abbas (23k-0927) · Layqa Fatima (23k-0572) · Areesha Merani (24k-0762)
 
 ---
-![Logo](frontend/Main2.png)
+![Logo](frontend/Main1.png)
 
 ## 1. Objective
 
