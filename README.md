@@ -217,8 +217,7 @@ All five test cases from Section 5.5 were verified:
 
 ### 6.3 Job Status Distribution
 
-*(Replace with a screenshot of the doughnut chart at peak load.)*
-
+![Logo](frontend/Screenshot_from_2026-05-10 22-34-48.png)
 ```
 [ INSERT SCREENSHOT: Job Status doughnut chart showing Pending (amber),
   Running (cyan), Completed (emerald), Preempted (rose) segments ]
